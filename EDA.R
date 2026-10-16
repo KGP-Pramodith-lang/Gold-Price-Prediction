@@ -1,32 +1,50 @@
-
 # =====================================================
 # GOLD PRICE FORECASTING
-# STEP 1: IMPORT AND INSPECT THE DATA
+# STEP 3: EXPLORATORY DATA ANALYSIS (EDA)
 # =====================================================
 
-# 1. Import the CSV file
-gold <- read.csv("gold prices.csv",
-                 stringsAsFactors = FALSE)
+# 1. Calculate Daily Returns
+# We use logarithmic returns (log returns) rather than simple percentage changes.
+# This is the industry standard for financial time series because log returns 
+# are symmetric and additive over time.
+gold$Return <- c(NA, diff(log(gold$Close)))
 
-# 2. Inspect the dataset
-head(gold)
-tail(gold)
+# 2. Calculate Volatility (Absolute Returns)
+# Taking the absolute value of the returns removes the direction (up or down)
+# and isolates the magnitude of the price movement.
+gold$Volatility <- abs(gold$Return)
 
-# 3. Check the number of rows and columns
-dim(gold)
+# 3. Setup the plotting area to show one plot at a time clearly
+par(mfrow = c(1, 1))
 
-# 4. Check the column names
-names(gold)
+# --- Analysis 1: Gold Price Trend ---
+plot(gold$Date, gold$Close, 
+     type = "l", 
+     col = "darkblue", 
+     lwd = 1.5,
+     main = "Analysis 1: Daily Gold Closing Prices", 
+     xlab = "Date", 
+     ylab = "Price (USD)")
+grid() # Adds a grid for easier reading
 
-# 5. Check the data types
-str(gold)
+# --- Analysis 2: Price Returns ---
+# Wait for the user to view the first plot, or just run this line to see the next one.
+plot(gold$Date, gold$Return, 
+     type = "l", 
+     col = "steelblue", 
+     lwd = 1,
+     main = "Analysis 2: Daily Log Returns", 
+     xlab = "Date", 
+     ylab = "Daily Return")
+abline(h = 0, col = "red", lty = 2, lwd = 2) # Adds a reference line at zero
+grid()
 
-# 6. Check missing values in each column
-colSums(is.na(gold))
-
-# 7. Check duplicate records
-sum(duplicated(gold))
-
-# 8. Check the date range as currently imported
-head(gold$Date)
-tail(gold$Date)
+# --- Analysis 3: Volatility Clustering ---
+plot(gold$Date, gold$Volatility, 
+     type = "l", 
+     col = "darkred", 
+     lwd = 1,
+     main = "Analysis 3: Volatility (Absolute Returns)", 
+     xlab = "Date", 
+     ylab = "Magnitude of Movement")
+grid()
