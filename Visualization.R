@@ -4,17 +4,15 @@
 # =====================================================
 
 # 1. Plot Actual vs. Predicted Prices
-# We will plot the actuals against the Baseline and our best ML model (Linear Regression)
-# to keep the chart clean and readable for your presentation.
+# Plotting actuals against Baseline, Linear Regression, and Random Forest
 plot(test_data_ml$Date, actuals, 
      type = "l", col = "black", lwd = 2,
      main = "Forecast Comparison: Actual vs. Predictions (Test Set)",
      xlab = "Date", ylab = "Gold Price (USD)",
-     ylim = range(c(actuals, pred_lm, pred_naive)))
+     ylim = range(c(actuals, pred_lm, pred_naive), na.rm = TRUE))
 
 lines(test_data_ml$Date, pred_naive, col = "gray", lty = 2, lwd = 1.5)
 lines(test_data_ml$Date, pred_lm, col = "blue", lwd = 1.5)
-# Adding Random Forest to show its failure to extrapolate
 lines(test_data_ml$Date, pred_rf, col = "red", lwd = 1.5, lty = 3) 
 
 legend("bottomright", 
@@ -25,28 +23,28 @@ legend("bottomright",
 
 grid()
 
-# 2. Assignment Requirement: Further Investigation (Volatility)
-# Hypothesis: Models are less accurate when the market is highly volatile.
+# 2. Assignment Requirement: Further Investigation (Volatility Regimes)
+# Hypothesis: Models are significantly less accurate during high market volatility.
 
-# Calculate the actual daily volatility in the test set
+# Calculate the actual daily absolute price swing in the test set
 test_volatility <- abs(test_data_ml$Target_Close - test_data_ml$Lag1_Close)
 
-# Define "High Volatility" as the top 20% of price swings, and "Low Volatility" as the rest
+# Define "High Volatility" as the top 20% of price swings
 threshold <- quantile(test_volatility, 0.80, na.rm = TRUE)
 
 high_vol_indices <- which(test_volatility >= threshold)
 low_vol_indices  <- which(test_volatility < threshold)
 
-# 3. Calculate Linear Regression MAE under different market conditions
-mae_high_vol <- mean(abs(actuals[high_vol_indices] - pred_lm[high_vol_indices]))
-mae_low_vol  <- mean(abs(actuals[low_vol_indices] - pred_lm[low_vol_indices]))
+# 3. Calculate Linear Regression MAE under different market regimes
+mae_high_vol <- mean(abs(actuals[high_vol_indices] - pred_lm[high_vol_indices]), na.rm = TRUE)
+mae_low_vol  <- mean(abs(actuals[low_vol_indices] - pred_lm[low_vol_indices]), na.rm = TRUE)
 
 # 4. Display the Investigation Results
-print("--- FURTHER INVESTIGATION: IMPACT OF MARKET VOLATILITY ---")
-print(paste("Volatility Threshold (Top 20%): Price swing > $", round(threshold, 2)))
-print(paste("Linear Regression MAE on CALM days: $", round(mae_low_vol, 3)))
-print(paste("Linear Regression MAE on VOLATILE days: $", round(mae_high_vol, 3)))
+cat("\n--- FURTHER INVESTIGATION: IMPACT OF MARKET VOLATILITY ---\n")
+cat("Volatility Threshold (Top 20%): Price swing > $", round(threshold, 2), "\n")
+cat("Linear Regression MAE on CALM days: $", round(mae_low_vol, 3), "\n")
+cat("Linear Regression MAE on VOLATILE days: $", round(mae_high_vol, 3), "\n")
 
-# Calculate how much worse the model performs during volatility
+# Calculate performance degradation percentage
 degradation <- (mae_high_vol / mae_low_vol) - 1
-print(paste("Model error increases by", round(degradation * 100, 1), "% during highly volatile market conditions."))
+cat("Model error increases by", round(degradation * 100, 1), "% during volatile market conditions.\n")

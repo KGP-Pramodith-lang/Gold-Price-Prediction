@@ -46,5 +46,5 @@ comparison_table$MAE  <- round(comparison_table$MAE, 3)
 comparison_table$RMSE <- round(comparison_table$RMSE, 3)
 comparison_table$MAPE <- round(comparison_table$MAPE, 3)
 
-print("--- FINAL MODEL COMPARISON TABLE ---")
+cat("--- FINAL MODEL COMPARISON TABLE ---\n")
 print(comparison_table)

@@ -1,4 +1,3 @@
-
 # =====================================================
 # GOLD PRICE FORECASTING
 # STEP 1: IMPORT AND INSPECT THE DATA
@@ -8,25 +7,30 @@
 gold <- read.csv("gold prices.csv",
                  stringsAsFactors = FALSE)
 
-# 2. Inspect the dataset
+# 2. Clean column names (removes any hidden leading/trailing spaces)
+names(gold) <- trimws(names(gold))
+
+# 3. Inspect the dataset structure and top/bottom rows
 head(gold)
 tail(gold)
-
-# 3. Check the number of rows and columns
 dim(gold)
-
-# 4. Check the column names
 names(gold)
-
-# 5. Check the data types
 str(gold)
 
-# 6. Check missing values in each column
+# 4. Statistical summary of numerical columns (mins, maxs, means)
+summary(gold)
+
+# 5. Check missing values in each column
 colSums(is.na(gold))
 
-# 7. Check duplicate records
-sum(duplicated(gold))
+# 6. Check for duplicate rows AND duplicate dates specifically
+cat("Duplicate rows:", sum(duplicated(gold)), "\n")
+if ("Date" %in% names(gold)) {
+  cat("Duplicate dates:", sum(duplicated(gold$Date)), "\n")
+}
 
-# 8. Check the date range as currently imported
-head(gold$Date)
-tail(gold$Date)
+# 7. Check the date range as currently imported
+if ("Date" %in% names(gold)) {
+  print(head(gold$Date))
+  print(tail(gold$Date))
+}
